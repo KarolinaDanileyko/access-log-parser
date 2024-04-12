@@ -47,6 +47,8 @@ public class Main {
             int i=0;//счётчик строк
             int maxLenght=0;
             int minLenght=0;
+            int yandexBot=0;
+            int googlebot=0;
             while ((line = reader.readLine()) != null) {//пока строка существует
 
                 int length = line.length();//записываем длину строки
@@ -63,13 +65,46 @@ public class Main {
                     minLenght=length;
                 }
 
+                String[] splited=line.split("\"-\"");//создаём массив и складываем разделённые строки по "-"
+                String lastBlock = splited[splited.length-1];//записываем последний блок
+
+                if(lastBlock.contains("(") ) {
+
+                    String[] splitedUserAgent=lastBlock.split("\\(");//создаём массив и складываем разделённые строки по "("
+
+                    String[] parts = splitedUserAgent[splitedUserAgent.length-1].split(";");
+                    if (parts.length >= 2) {
+                        String fragment = parts[1];
+                        fragment=fragment.replace(" ", "");
+                        int indexSlash=fragment.indexOf("/");
+
+                        if(indexSlash>=0){
+                            fragment=fragment.substring(0,indexSlash);
+
+                            if (fragment.contains("YandexBot")){
+                                yandexBot++;
+                            }
+
+                            if (fragment.contains("Googlebot")){
+                                googlebot++;
+                            }
+                        }
+
+
+                    }
+                }
+
                 i++;//считаем кол-во строк в файле
 
             }
             fileReader.close();
-            System.out.println(maxLenght + " - самая длинная строка.");
-            System.out.println(minLenght + " - самая короткая строка.");
+//            System.out.println(maxLenght + " - самая длинная строка.");
+//            System.out.println(minLenght + " - самая короткая строка.");
             System.out.println(i + " - количество строк.");
+            System.out.println(yandexBot + " количество запросов от YandexBot.");
+            System.out.println(googlebot + " количество запросов от Googlebot.");
+            System.out.println((double)yandexBot* 100/i + " доля запросов от YandexBot.");
+            System.out.println((double)googlebot* 100/i + " доля запросов от Googlebot.");
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -79,4 +114,4 @@ public class Main {
 
 }
 
-
+//C:\Users\kdanileyko\Desktop\Study\access.log
