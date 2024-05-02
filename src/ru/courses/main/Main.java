@@ -1,5 +1,4 @@
 package ru.courses.main;
-
 import ru.courses.exceptions.MyException;
 import ru.courses.pars.LogEntry;
 import ru.courses.pars.Statistics;
@@ -11,6 +10,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
         String path = checkFile();//получение правильного пути к файлу, например: C:\Users\kdanileyko\Desktop\Study\access.log
         file(path);//вызов метода чтения файла
         System.out.println("Нажмите <Enter> для выхода.");
@@ -79,12 +79,16 @@ public class Main {
 
             System.out.println("Объём часового трафика: " + statistics.getTrafficRate());
             System.out.println("Количество строк в файле: " + i);
+            System.out.println("Все существующие страницы сайта: " + statistics.getExistingAddreses());
+            System.out.println("Статистика ОС с долей каждой: " + statistics.getOsStatictics());
+
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
     }
+
 
 }
 

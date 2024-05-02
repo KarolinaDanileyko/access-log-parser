@@ -58,7 +58,7 @@ public class LogEntry {
         return path;
     }
 
-    public int getstatusCodes() {
+    public int getStatusCodes() {
         return statusCodes;
     }
 
