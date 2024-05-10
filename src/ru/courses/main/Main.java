@@ -79,8 +79,10 @@ public class Main {
 
             System.out.println("Объём часового трафика: " + statistics.getTrafficRate());
             System.out.println("Количество строк в файле: " + i);
-            System.out.println("Все существующие страницы сайта: " + statistics.getExistingAddreses());
+            System.out.println("Список существующих страниц сайта: " + statistics.getExistingAddreses());
+            System.out.println("Список несуществующих страниц: "+statistics.getBadAddreses());
             System.out.println("Статистика ОС с долей каждой: " + statistics.getOsStatictics());
+            System.out.println("Статистика браузеров с долей каждого: "+statistics.getBrowsersStatictics());
 
 
         } catch (Exception ex) {
