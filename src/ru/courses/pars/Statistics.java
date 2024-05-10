@@ -2,6 +2,8 @@ package ru.courses.pars;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,7 +19,11 @@ public class Statistics {
     private HashMap<String, Integer> statisticsBrowsers;//статистика браузеров
     private HashMap<String, Integer> statisticsOfAddresses; //мапа для адресов сайтов и кол-ва их посещений
     private HashMap<String, Integer> statisticsOfIp; //мапа для ip пользователей и кол-ва его посещений
+    private HashMap<Integer, Integer> trafficInSecond;//мапа для посещений в секунду
+    private HashSet<String> referers;//сайты, со страниц которых есть ссылки на текущий сайт
     private int countOfFail;//переменная для подсчёта ошибочных запросов
+
+    private final ZoneOffset ZONE_OFFSET;
 
     public Statistics() { //конструктор без параметров, в котором должны инициализироваться переменные класса
         this.minTime = null;
@@ -29,6 +35,9 @@ public class Statistics {
         this.statisticsBrowsers = new HashMap<>();
         this.statisticsOfAddresses = new HashMap<>();
         this.statisticsOfIp = new HashMap<>();
+        this.trafficInSecond = new HashMap<>();
+        this.ZONE_OFFSET = ZoneOffset.ofHours(3);
+        this.referers = new HashSet<>();
     }
 
     public void addEntry(LogEntry log) {//метод, принимающий в качестве параметра объект класса LogEntry
@@ -72,9 +81,20 @@ public class Statistics {
             statisticsBrowsers.put(browserType, 1);//если встретилось первый раз (не содержится в map)
         }
 
-        String address = log.getPath();
+        if (log.getStatusCodes() >= 400 && log.getStatusCodes() < 600) {
+            countOfFail++;//увеличиваем если код ответа содержит коды от 400 до 599
+        }
+
+        //заполнение referers сайты, со страниц которых есть ссылки на текущий сайт
+        String refName=getRefererDomen(log.getReferer());
+        if(refName!=null){
+            referers.add(refName);//заполняем сэт вырезанными доменами из реферера лога
+        }
+
         //иф заполнения мапы для адресов сайтов и кол-ва их посещений
         if (!log.getUserAgent().isBot()) {
+            String address = log.getPath();
+
             if (statisticsOfAddresses.containsKey(address)) {
 
                 Integer i = statisticsOfAddresses.get(address);
@@ -85,15 +105,8 @@ public class Statistics {
                 statisticsOfAddresses.put(address, 1);
             }
 
-        }
-
-        if (log.getStatusCodes() >= 400 && log.getStatusCodes() < 600) {
-            countOfFail++;//увеличиваем если код ответа содержит коды от 400 до 599
-        }
-
-        String ip = log.getIp();
-        //иф для заполнения мапы ip и посещений
-        if (!log.getUserAgent().isBot()) {
+            String ip = log.getIp();
+            //иф для заполнения мапы ip и посещений
             if (statisticsOfIp.containsKey(ip)) {
 
                 Integer i = statisticsOfIp.get(ip);
@@ -104,9 +117,38 @@ public class Statistics {
                 statisticsOfIp.put(ip, 1);
             }
 
+            //заполнение мапы с посещениями в секунду
+            int sec= (int) log.getTime().toInstant(ZONE_OFFSET).getEpochSecond();
+            if (trafficInSecond.containsKey(sec)) {
+
+                Integer i = trafficInSecond.get(sec);
+                i++;
+                trafficInSecond.put(sec, i);
+
+            } else {
+                trafficInSecond.put(sec, 1);
+            }
+
+
         }
+
         addExistingAddresses(log);
         addBadAddresses(log);
+    }
+
+
+    private String getRefererDomen(String str){// метод возврата адресов доменов
+        if (str==null){
+            return null;
+        }
+        int index = str.indexOf("//"); //узнаём индекс двух слэшей
+
+        if (index==-1){//если не нашли двойной слэш
+            return null;
+        }
+        str=str.substring(index+2);//записываем в строку часть строки, начинающуюся с двух слэшей
+        index = str.indexOf("/"); //узнаём индекс одного слэша
+        return str.substring(0, index);//возвращаем в подстроку часть строки от // до /
     }
 
     private void addExistingAddresses(LogEntry log) {//метод добавления существующего (200) адреса в общий список
@@ -161,6 +203,14 @@ public class Statistics {
         return duration.toHours();
     }
 
+
+    public int getPeakTrafficInSecond(){ //Метод возвращает расчёт пиковой посещаемости сайта (в секунду)
+       return trafficInSecond.values()
+                .stream()
+                .max(Comparator.comparingInt(i -> i))
+               .get();
+    }
+
     public Map<String, Double> getAddressesByHours() {//Метод подсчёта среднего количества посещений сайта за час
         return statisticsOfAddresses.entrySet()// Метод entrySet() возвращает список всех пар (ключ, знач) в HashMap
                 .stream()//запуск потока от пар мапы
@@ -179,6 +229,13 @@ public class Statistics {
         return i/(double) statisticsOfIp.size(); //общее кол-во посещений пользователями делить на число уникальных IP
     }
 
+    public int maxUserRequests(){//метод возврата максимального кол-ва посещаемости одним пользователем
+       return statisticsOfIp.values()
+                .stream()
+                .max(Comparator.comparingInt(i -> i))
+               .get();
+    }
+
 
     public HashSet<String> getExistingAddresses() {//метод возврата списка существующих страниц
         return addresses;
@@ -188,4 +245,7 @@ public class Statistics {
         return badAddresses;
     }
 
+    public HashSet<String> getReferers() {//метод получения рефереров
+        return referers;
+    }
 }

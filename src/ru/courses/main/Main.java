@@ -87,6 +87,9 @@ public class Main {
             System.out.println("Статистика среднего кол-ва посещений сайта за час: " + statistics.getAddressesByHours());
             System.out.println("Статистика среднего кол-ва ошибочных запросов в час " + statistics.countOfFailByHours());
             System.out.println("Статистика средней посещаемости одним пользователем: " + statistics.getAverageAttendance());
+            System.out.println("Пиковая посещаемость сайта в секунду: " + statistics.getPeakTrafficInSecond());
+            System.out.println("Список сайтов, со страниц которых есть ссылки на текущий сайт: " + statistics.getReferers());
+            System.out.println("Максимальная посещаемость одним пользователем: " + statistics.maxUserRequests());
 
 
         } catch (Exception ex) {
