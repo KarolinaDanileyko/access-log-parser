@@ -1,4 +1,5 @@
 package ru.courses.main;
+
 import ru.courses.exceptions.MyException;
 import ru.courses.pars.LogEntry;
 import ru.courses.pars.Statistics;
@@ -79,10 +80,13 @@ public class Main {
 
             System.out.println("Объём часового трафика: " + statistics.getTrafficRate());
             System.out.println("Количество строк в файле: " + i);
-            System.out.println("Список существующих страниц сайта: " + statistics.getExistingAddreses());
-            System.out.println("Список несуществующих страниц: "+statistics.getBadAddreses());
+            System.out.println("Список существующих страниц сайта: " + statistics.getExistingAddresses());
+            System.out.println("Список несуществующих страниц: " + statistics.getBadAddresses());
             System.out.println("Статистика ОС с долей каждой: " + statistics.getOsStatictics());
-            System.out.println("Статистика браузеров с долей каждого: "+statistics.getBrowsersStatictics());
+            System.out.println("Статистика браузеров с долей каждого: " + statistics.getBrowsersStatictics());
+            System.out.println("Статистика среднего кол-ва посещений сайта за час: " + statistics.getAddressesByHours());
+            System.out.println("Статистика среднего кол-ва ошибочных запросов в час " + statistics.countOfFailByHours());
+            System.out.println("Статистика средней посещаемости одним пользователем: " + statistics.getAverageAttendance());
 
 
         } catch (Exception ex) {

@@ -42,7 +42,7 @@ public class LogEntry {
 
     }
 
-    public String getip() {
+    public String getIp() {
         return ipAddr;
     }
 
